@@ -68,9 +68,9 @@ class BusTimesFetcher:
             logging.error(f"Error during cleanup: {e}")
 
     def get_departures(self):
-        """Get departures from Ålidhem Centrum."""
+        """Get departures from Trafiklabs."""
         try:
-            logging.info("Fetching departures from Ålidhem Centrum...")
+            logging.info("Fetching departures from Trafiklabs...")
             
             # Clean up old files before fetching new data
             self._cleanup_old_files()
