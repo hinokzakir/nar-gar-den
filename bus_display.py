@@ -16,6 +16,9 @@ class BusDisplay:
         # Make window fullscreen
         self.root.attributes('-fullscreen', True)
         
+        # Load settings
+        self.load_settings()
+        
         # Configure fonts
         self.setup_fonts()
         
@@ -41,6 +44,26 @@ class BusDisplay:
         # Bind escape key to exit
         self.root.bind('<Escape>', lambda e: self.root.quit())
 
+    def load_settings(self):
+        """Load settings from settings.txt file."""
+        try:
+            with open('settings.txt', 'r') as f:
+                for line in f:
+                    if line.strip() and not line.startswith('#'):
+                        key, value = line.strip().split('=')
+                        if key == 'DEPARTURES_TO_SHOW':
+                            self.departures_to_show = int(value)
+                            break
+            if not hasattr(self, 'departures_to_show'):
+                print("DEPARTURES_TO_SHOW not found in settings.txt, using default value of 3")
+                self.departures_to_show = 3
+        except FileNotFoundError:
+            print("settings.txt not found, using default value of 3 departures")
+            self.departures_to_show = 3
+        except Exception as e:
+            print(f"Error reading settings.txt: {e}, using default value of 3 departures")
+            self.departures_to_show = 3
+
     def setup_fonts(self):
         """Setup fonts with Minecraft as primary choice."""
         # Try to use Minecraft, fall back to Courier if not available
@@ -53,14 +76,14 @@ class BusDisplay:
                 update_font = ('Minecraft', 30)
             else:
                 print("Minecraft font not found, using Courier")
-                platform_font = ('Courier', 24, 'bold')
-                departure_font = ('Courier', 20)
-                update_font = ('Courier', 12)
+                platform_font = ('Courier', 60, 'bold')
+                departure_font = ('Courier', 50)
+                update_font = ('Courier', 30)
         except Exception as e:
             print(f"Error setting up fonts: {e}")
-            platform_font = ('Courier', 24, 'bold')
-            departure_font = ('Courier', 20)
-            update_font = ('Courier', 12)
+            platform_font = ('Courier', 60, 'bold')
+            departure_font = ('Courier', 50)
+            update_font = ('Courier', 30)
 
         # Configure styles
         self.style = ttk.Style()
@@ -133,7 +156,7 @@ class BusDisplay:
                 # Departures
                 now = datetime.now()
                 upcoming = [d for d in departures 
-                          if datetime.fromisoformat(d['time']) > now][:3]
+                          if datetime.fromisoformat(d['time']) > now][:self.departures_to_show]
                 
                 for dep in upcoming:
                     dep_frame = ttk.Frame(platform_frame, style='Platform.TLabel')

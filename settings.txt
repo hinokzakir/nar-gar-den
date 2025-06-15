@@ -1,2 +1,3 @@
 # Trafiklab API Settings
 SITE_ID=740023156
+DEPARTURES_TO_SHOW=4

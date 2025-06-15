@@ -19,10 +19,11 @@ TRAFIKLAB_API_KEY=your_api_key_here
 You get this by visiting the [Trafiklab's developer website](https://developer.trafiklab.se/)
 and signing up a developer account.
 
-2. Create a `settings.txt` file with your station ID:
+2. Create a `settings.txt` file with your station ID and how many departures you want displayed:
 ```
 # Trafiklab API Settings
 SITE_ID=your_station_id_here
+DEPARTURES_TO_SHOW=XX
 ```
 
 You can find your station ID by:
