@@ -19,15 +19,15 @@ class BusDisplay:
         # Configure style
         self.style = ttk.Style()
         self.style.configure('Platform.TLabel', 
-                           font=('Courier', 24, 'bold'),
+                           font=('Courier', 120, 'bold'),
                            foreground='orange',
                            background='black')
         self.style.configure('Departure.TLabel',
-                           font=('Courier', 20),
+                           font=('Courier', 100),
                            foreground='orange',
                            background='black')
         self.style.configure('LastUpdate.TLabel',
-                           font=('Courier', 12),
+                           font=('Courier', 60),
                            foreground='orange',
                            background='black')
         
