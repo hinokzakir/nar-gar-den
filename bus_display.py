@@ -48,19 +48,19 @@ class BusDisplay:
             # Check if Minecraft is available
             available_fonts = font.families()
             if 'Minecraft' in available_fonts:
-                platform_font = ('Minecraft', 24, 'bold')
-                departure_font = ('Minecraft', 20)
-                update_font = ('Minecraft', 12)
+                platform_font = ('Minecraft', 60, 'bold')
+                departure_font = ('Minecraft', 50)
+                update_font = ('Minecraft', 30)
             else:
                 print("Minecraft font not found, using Courier")
-                platform_font = ('Courier', 24, 'bold')
-                departure_font = ('Courier', 20)
-                update_font = ('Courier', 12)
+                platform_font = ('Courier', 60, 'bold')
+                departure_font = ('Courier', 50)
+                update_font = ('Courier', 30)
         except Exception as e:
             print(f"Error setting up fonts: {e}")
-            platform_font = ('Courier', 24, 'bold')
-            departure_font = ('Courier', 20)
-            update_font = ('Courier', 12)
+            platform_font = ('Courier', 60, 'bold')
+            departure_font = ('Courier', 50)
+            update_font = ('Courier', 30)
 
         # Configure styles
         self.style = ttk.Style()
