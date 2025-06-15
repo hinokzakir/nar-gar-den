@@ -7,7 +7,6 @@ A real-time bus departure display system using the Trafiklab API. This applicati
 - Real-time bus departure information
 - Support for any station in the Trafiklab API
 - Automatic data refresh every 10 minutes
-- Pixelated Minecraft-style display
 - Full-screen mode
 - Countdown timers for each departure
 
