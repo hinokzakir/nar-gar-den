@@ -1,6 +1,8 @@
 # NärGårDen?
 
 A real-time bus departure display system using the Trafiklab API. This application can display departures for any station supported by the Trafiklab API.
+As the swedish name might tell you this application only works in Sweden but the readme is still in english to improve accesebility.
+
 
 ## Features
 
