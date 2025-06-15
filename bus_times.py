@@ -29,7 +29,7 @@ class BusTimesFetcher:
         self.base_url = "https://realtime-api.trafiklab.se/v1/departures"
         
         # Site ID for Ålidhem Centrum in Umeå
-        self.site_id = "740000001"  # Ålidhem Centrum, Umeå
+        self.site_id = "740023156"  # Ålidhem Centrum, Umeå
         
         # Headers for the API request
         self.headers = {
@@ -39,12 +39,12 @@ class BusTimesFetcher:
     def get_departures(self):
         """Get departures from Ålidhem Centrum."""
         try:
-            logging.info("Hämtar avgångar från Ålidhem Centrum...")
+            logging.info("Fetching departures from Ålidhem Centrum...")
             
             # Construct the URL with site ID and API key
             url = f"{self.base_url}/{self.site_id}?key={self.api_key}"
             
-            logging.info(f"Skickar API-anrop till {url}")
+            logging.info(f"Sending API request to {url}")
             
             # Make the API request
             response = requests.get(
@@ -53,75 +53,71 @@ class BusTimesFetcher:
             )
 
             # Log the response status
-            logging.info(f"API-svar status: {response.status_code}")
+            logging.info(f"API response status: {response.status_code}")
             
             # Check if the request was successful
             response.raise_for_status()
 
             # Parse the response
             data = response.json()
-            logging.info("Fick svar från API och parsade det")
+            logging.info("Received and parsed API response")
             
-            # Process and format the data
-            departures = self._process_departures(data)
+            # Save the raw data
+            self._save_data(data)
             
-            # Save the data
-            self._save_data(departures)
+            # Create processed data
+            self._create_processed_data(data)
             
-            return departures
+            return data
 
         except requests.exceptions.RequestException as e:
-            logging.error(f"API-anrop misslyckades: {str(e)}")
+            logging.error(f"API request failed: {str(e)}")
             if hasattr(e.response, 'text'):
-                logging.error(f"Svar från API: {e.response.text}")
+                logging.error(f"API response: {e.response.text}")
             return None
         except Exception as e:
-            logging.error(f"Fel vid hämtning av avgångar: {str(e)}")
-            return None
-
-    def _process_departures(self, data):
-        """Process the raw API response into a structured format."""
-        try:
-            processed_data = {
-                "hållplats": "Ålidhem Centrum",
-                "tidpunkt": datetime.now().isoformat(),
-                "avgångar": []
-            }
-            
-            # Process each departure in the response
-            if 'departures' in data:
-                for departure in data['departures']:
-                    departure_info = {
-                        "linje": departure.get('line', ''),
-                        "destination": departure.get('destination', ''),
-                        "avgångstid": departure.get('time', ''),
-                        "spår": departure.get('track', ''),
-                        "realtid": departure.get('realtime', False),
-                        "inställd": departure.get('cancelled', False)
-                    }
-                    processed_data["avgångar"].append(departure_info)
-                logging.info(f"Processade {len(processed_data['avgångar'])} avgångar")
-            else:
-                logging.warning("Inga avgångar hittades i svaret")
-            
-            return processed_data
-            
-        except Exception as e:
-            logging.error(f"Fel vid bearbetning av avgångar: {str(e)}")
+            logging.error(f"Error fetching departures: {str(e)}")
             return None
 
     def _save_data(self, data):
-        """Save the processed data to a JSON file."""
+        """Save the raw API response to a JSON file."""
         if not data:
             return
             
-        filename = f"avgångar_{datetime.now().strftime('%Y%m%d_%H%M')}.json"
+        filename = f"departures_{datetime.now().strftime('%Y%m%d_%H%M')}.json"
         try:
             with open(filename, 'w', encoding='utf-8') as f:
                 json.dump(data, f, ensure_ascii=False, indent=2)
-            logging.info(f"Data sparad till {filename}")
+            logging.info(f"Raw data saved to {filename}")
         except Exception as e:
-            logging.error(f"Fel vid sparande av data: {str(e)}")
+            logging.error(f"Error saving raw data: {str(e)}")
+
+    def _create_processed_data(self, raw_data):
+        """Create a new JSON file with processed departure information."""
+        if not raw_data or 'departures' not in raw_data:
+            return
+
+        processed_data = {
+            "timestamp": datetime.now().isoformat(),
+            "departures": []
+        }
+
+        for departure in raw_data['departures']:
+            departure_info = {
+                "scheduled_time": departure.get('scheduled', ''),
+                "cancelled": departure.get('cancelled', False),
+                "route_designation": departure.get('route', {}).get('designation', ''),
+                "platform_designation": departure.get('realtime_platform', {}).get('designation', '')
+            }
+            processed_data["departures"].append(departure_info)
+
+        filename = f"processed_departures_{datetime.now().strftime('%Y%m%d_%H%M')}.json"
+        try:
+            with open(filename, 'w', encoding='utf-8') as f:
+                json.dump(processed_data, f, ensure_ascii=False, indent=2)
+            logging.info(f"Processed data saved to {filename}")
+        except Exception as e:
+            logging.error(f"Error saving processed data: {str(e)}")
 
 def main():
     """Main function to fetch bus times."""
@@ -129,7 +125,7 @@ def main():
         fetcher = BusTimesFetcher()
         fetcher.get_departures()
     except Exception as e:
-        logging.error(f"Ett oväntat fel uppstod: {str(e)}")
+        logging.error(f"An unexpected error occurred: {str(e)}")
 
 if __name__ == "__main__":
     main() 
