@@ -1,6 +1,6 @@
-# Busstider Ålidhem Centrum
+# NärGårDen?
 
-Ett Python-script som hämtar realtidsinformation om busstider från Ålidhem Centrum i Umeå via Trafiklab API.
+Ett Python-script som hämtar realtidsinformation om busstider från Ålidhem Centrum i Umeå via Trafiklab API. Meant for displaying on a screen in your room.
 
 ## Krav
 
@@ -57,4 +57,4 @@ Scriptet loggar alla operationer till både:
 
 ## Obs
 
-Detta script använder Trafiklab API. Vänligen respektera deras användarvillkor och gränser. 
+Detta script använder Trafiklab API. Vänligen respektera deras användarvillkor och gränser.
