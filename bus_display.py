@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, font
 import json
 from datetime import datetime
 import time
@@ -16,20 +16,8 @@ class BusDisplay:
         # Make window fullscreen
         self.root.attributes('-fullscreen', True)
         
-        # Configure style
-        self.style = ttk.Style()
-        self.style.configure('Platform.TLabel', 
-                           font=('Courier', 120, 'bold'),
-                           foreground='orange',
-                           background='black')
-        self.style.configure('Departure.TLabel',
-                           font=('Courier', 100),
-                           foreground='orange',
-                           background='black')
-        self.style.configure('LastUpdate.TLabel',
-                           font=('Courier', 60),
-                           foreground='orange',
-                           background='black')
+        # Configure fonts
+        self.setup_fonts()
         
         # Create main container
         self.main_frame = ttk.Frame(root, style='Platform.TLabel')
@@ -52,6 +40,42 @@ class BusDisplay:
         
         # Bind escape key to exit
         self.root.bind('<Escape>', lambda e: self.root.quit())
+
+    def setup_fonts(self):
+        """Setup fonts with Fixedsys as primary choice."""
+        # Try to use Fixedsys, fall back to Courier if not available
+        try:
+            # Check if Fixedsys is available
+            available_fonts = font.families()
+            if 'Fixedsys' in available_fonts:
+                platform_font = ('Fixedsys', 24, 'bold')
+                departure_font = ('Fixedsys', 20)
+                update_font = ('Fixedsys', 12)
+            else:
+                print("Fixedsys font not found, using Courier")
+                platform_font = ('Courier', 24, 'bold')
+                departure_font = ('Courier', 20)
+                update_font = ('Courier', 12)
+        except Exception as e:
+            print(f"Error setting up fonts: {e}")
+            platform_font = ('Courier', 24, 'bold')
+            departure_font = ('Courier', 20)
+            update_font = ('Courier', 12)
+
+        # Configure styles
+        self.style = ttk.Style()
+        self.style.configure('Platform.TLabel', 
+                           font=platform_font,
+                           foreground='orange',
+                           background='black')
+        self.style.configure('Departure.TLabel',
+                           font=departure_font,
+                           foreground='orange',
+                           background='black')
+        self.style.configure('LastUpdate.TLabel',
+                           font=update_font,
+                           foreground='orange',
+                           background='black')
 
     def update_data(self):
         """Fetch new data from the API and process it."""
