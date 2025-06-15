@@ -42,17 +42,17 @@ class BusDisplay:
         self.root.bind('<Escape>', lambda e: self.root.quit())
 
     def setup_fonts(self):
-        """Setup fonts with Fixedsys as primary choice."""
-        # Try to use Fixedsys, fall back to Courier if not available
+        """Setup fonts with Minecraft as primary choice."""
+        # Try to use Minecraft, fall back to Courier if not available
         try:
-            # Check if Fixedsys is available
+            # Check if Minecraft is available
             available_fonts = font.families()
-            if 'Fixedsys' in available_fonts:
-                platform_font = ('Fixedsys', 24, 'bold')
-                departure_font = ('Fixedsys', 20)
-                update_font = ('Fixedsys', 12)
+            if 'Minecraft' in available_fonts:
+                platform_font = ('Minecraft', 24, 'bold')
+                departure_font = ('Minecraft', 20)
+                update_font = ('Minecraft', 12)
             else:
-                print("Fixedsys font not found, using Courier")
+                print("Minecraft font not found, using Courier")
                 platform_font = ('Courier', 24, 'bold')
                 departure_font = ('Courier', 20)
                 update_font = ('Courier', 12)
