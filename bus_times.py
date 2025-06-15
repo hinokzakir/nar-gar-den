@@ -107,7 +107,8 @@ class BusTimesFetcher:
                 "scheduled_time": departure.get('scheduled', ''),
                 "cancelled": departure.get('cancelled', False),
                 "route_designation": departure.get('route', {}).get('designation', ''),
-                "platform_designation": departure.get('realtime_platform', {}).get('designation', '')
+                "platform_designation": departure.get('realtime_platform', {}).get('designation', ''),
+                "direction": departure.get('route', {}).get('direction', ''),
             }
             processed_data["departures"].append(departure_info)
 

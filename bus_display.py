@@ -53,14 +53,14 @@ class BusDisplay:
                 update_font = ('Minecraft', 30)
             else:
                 print("Minecraft font not found, using Courier")
-                platform_font = ('Courier', 60, 'bold')
-                departure_font = ('Courier', 50)
-                update_font = ('Courier', 30)
+                platform_font = ('Courier', 24, 'bold')
+                departure_font = ('Courier', 20)
+                update_font = ('Courier', 12)
         except Exception as e:
             print(f"Error setting up fonts: {e}")
-            platform_font = ('Courier', 60, 'bold')
-            departure_font = ('Courier', 50)
-            update_font = ('Courier', 30)
+            platform_font = ('Courier', 24, 'bold')
+            departure_font = ('Courier', 20)
+            update_font = ('Courier', 12)
 
         # Configure styles
         self.style = ttk.Style()
@@ -140,7 +140,7 @@ class BusDisplay:
                     dep_frame.pack(fill='x', pady=2)
                     
                     route_label = ttk.Label(dep_frame,
-                                          text=f"Linje {dep['route']}",
+                                          text=f"Linje {dep['route']} {dep['direction']} ",
                                           style='Departure.TLabel')
                     route_label.pack(side='left', padx=20)
                     

@@ -29,7 +29,8 @@ def create_platform_lists(departures):
 
         platform_map[platform].append({
             'route': departure['route_designation'],
-            'time': departure['scheduled_time']
+            'time': departure['scheduled_time'],
+            'direction': departure['direction']
         })
 
     # Sort departures by time for each platform
