@@ -39,9 +39,3 @@ ENV/
 departures_*.json
 processed_departures_*.json
 departure_lists/
-
-# HTML/CSS (except main files)
-*.html
-*.css
-!index.html
-!styles.css

@@ -1,60 +1,71 @@
 # NärGårDen?
 
-A Python script that fetches real-time bus departure information from Ålidhem Centrum in Umeå using the Trafiklab API. Meant for displaying on a screen in your room.
+A real-time bus departure display system using the Trafiklab API. This application can display departures for any station supported by the Trafiklab API.
 
-## Requirements
+## Features
 
-- Python 3.8 or higher
-- Trafiklab API key
-- Internet connection
+- Real-time bus departure information
+- Support for any station in the Trafiklab API
+- Automatic data refresh every 10 minutes
+- Pixelated Minecraft-style display
+- Full-screen mode
+- Countdown timers for each departure
 
-## Installation
+## Setup
 
-1. Clone this repository
-2. Install required packages:
-```bash
-pip install -r requirements.txt
-```
-
-3. Create a `.env` file in the project root with your Trafiklab API key:
+1. Create a `.env` file in the project root with your Trafiklab API key:
 ```
 TRAFIKLAB_API_KEY=your_api_key_here
 ```
 
-## Usage
-
-Run the script:
-```bash
-python bus_times.py
+2. Create a `settings.txt` file with your station ID:
+```
+# Trafiklab API Settings
+SITE_ID=your_station_id_here
 ```
 
-The script will:
-- Fetch current departures from Ålidhem Centrum
-- Save the information in a timestamped JSON file
-- Create a log file (bus_times.log) with information about the execution
+You can find your station ID by:
+1. Going to [Trafiklab's API documentation](https://www.trafiklab.se/api)
+2. Looking up your station in their station list
+3. Using the station's ID in the settings file
 
-## Output
+## Installation
 
-The script creates JSON files with the following naming convention:
-`avgångar_YYYYMMDD_HHMM.json`
+1. Install the required Python packages:
+```bash
+pip install -r requirements.txt
+```
 
-Each file contains:
-- Stop name
-- Timestamp of data retrieval
-- List of departures including:
-  - Line number
-  - Destination
-  - Departure time
-  - Track
-  - Real-time information
-  - Cancelled departures
+2. Run the display:
+```bash
+python bus_display.py
+```
 
-## Logging
+The display will automatically:
+- Fetch initial data
+- Update every 10 minutes
+- Show countdown timers
+- Display the next 3 departures for each platform
 
-The script logs all operations to both:
-- Console output
-- `bus_times.log` file
+## Controls
 
-## Note
+- Press `ESC` to exit the display
 
-This script uses the Trafiklab API. Please respect their terms of service and rate limits.
+## Files
+
+- `bus_times.py`: Fetches data from the Trafiklab API
+- `process_departures.py`: Processes the raw API data
+- `bus_display.py`: Displays the departures in a visual interface
+- `settings.txt`: Configuration file for station ID
+- `.env`: Contains your Trafiklab API key
+
+## Data Files
+
+The application creates several JSON files:
+- `departures_*.json`: Raw API response
+- `processed_departures_*.json`: Processed departure data
+- `departure_lists/platform_departures.json`: Platform-specific departure lists
+
+## License
+
+MIT License
