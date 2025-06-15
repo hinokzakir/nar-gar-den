@@ -5,7 +5,7 @@ from datetime import datetime
 import requests
 from dotenv import load_dotenv
 
-# Set up logging
+# Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
@@ -19,114 +19,89 @@ class BusTimesFetcher:
     def __init__(self):
         # Load environment variables
         load_dotenv()
-        
-        # Get API key from environment variable
         self.api_key = os.getenv('TRAFIKLAB_API_KEY')
         if not self.api_key:
-            raise ValueError("TRAFIKLAB_API_KEY not found in environment variables")
+            raise ValueError("TRAFIKLAB_API_KEY not found in .env file")
         
-        # Base URL for the Trafiklab API
-        self.base_url = "https://realtime-api.trafiklab.se/v1/departures"
+        # Load settings
+        self.load_settings()
         
-        # Site ID for Ålidhem Centrum in Umeå
-        self.site_id = "740023156"  # Ålidhem Centrum, Umeå
-        
-        # Headers for the API request
+        # Prepare headers for API request
         self.headers = {
-            'accept': 'application/json'
+            'Accept': 'application/json',
+            'Ocp-Apim-Subscription-Key': self.api_key
         }
 
-    def get_departures(self):
-        """Get departures from Ålidhem Centrum."""
+    def load_settings(self):
+        """Load settings from settings.txt file."""
         try:
-            logging.info("Fetching departures from Ålidhem Centrum...")
+            with open('settings.txt', 'r') as f:
+                for line in f:
+                    if line.strip() and not line.startswith('#'):
+                        key, value = line.strip().split('=')
+                        if key == 'SITE_ID':
+                            self.site_id = value
+                            break
+            if not hasattr(self, 'site_id'):
+                raise ValueError("SITE_ID not found in settings.txt")
+        except FileNotFoundError:
+            raise FileNotFoundError("settings.txt not found")
+        except Exception as e:
+            raise ValueError(f"Error reading settings.txt: {e}")
+
+    def get_departures(self):
+        """Fetch departures from the API."""
+        try:
+            # Log the start of the process
+            logging.info(f"Fetching departures from Ålidhem Centrum...")
             
-            # Construct the URL with site ID and API key
-            url = f"{self.base_url}/{self.site_id}?key={self.api_key}"
-            
+            # Construct the API URL
+            url = f"https://realtime-api.trafiklab.se/v1/departures/{self.site_id}"
             logging.info(f"Sending API request to {url}")
             
             # Make the API request
-            response = requests.get(
-                url,
-                headers=self.headers
-            )
-
-            # Log the response status
+            response = requests.get(url, headers=self.headers)
             logging.info(f"API response status: {response.status_code}")
             
             # Check if the request was successful
             response.raise_for_status()
-
+            
             # Parse the response
             data = response.json()
             logging.info("Received and parsed API response")
             
-            # Save the raw data
-            self._save_data(data)
+            # Save raw data
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M")
+            raw_filename = f"departures_{timestamp}.json"
+            with open(raw_filename, 'w', encoding='utf-8') as f:
+                json.dump(data, f, indent=2, ensure_ascii=False)
+            logging.info(f"Raw data saved to {raw_filename}")
             
-            # Create processed data
-            self._create_processed_data(data)
+            # Save processed data
+            processed_filename = f"processed_departures_{timestamp}.json"
+            with open(processed_filename, 'w', encoding='utf-8') as f:
+                json.dump(data, f, indent=2, ensure_ascii=False)
+            logging.info(f"Processed data saved to {processed_filename}")
             
             return data
-
-        except requests.exceptions.RequestException as e:
-            logging.error(f"API request failed: {str(e)}")
-            if hasattr(e.response, 'text'):
-                logging.error(f"API response: {e.response.text}")
-            return None
-        except Exception as e:
-            logging.error(f"Error fetching departures: {str(e)}")
-            return None
-
-    def _save_data(self, data):
-        """Save the raw API response to a JSON file."""
-        if not data:
-            return
             
-        filename = f"departures_{datetime.now().strftime('%Y%m%d_%H%M')}.json"
-        try:
-            with open(filename, 'w', encoding='utf-8') as f:
-                json.dump(data, f, ensure_ascii=False, indent=2)
-            logging.info(f"Raw data saved to {filename}")
+        except requests.exceptions.RequestException as e:
+            logging.error(f"Error fetching departures: {e}")
+            raise
+        except json.JSONDecodeError as e:
+            logging.error(f"Error parsing API response: {e}")
+            raise
         except Exception as e:
-            logging.error(f"Error saving raw data: {str(e)}")
-
-    def _create_processed_data(self, raw_data):
-        """Create a new JSON file with processed departure information."""
-        if not raw_data or 'departures' not in raw_data:
-            return
-
-        processed_data = {
-            "timestamp": datetime.now().isoformat(),
-            "departures": []
-        }
-
-        for departure in raw_data['departures']:
-            departure_info = {
-                "scheduled_time": departure.get('scheduled', ''),
-                "cancelled": departure.get('cancelled', False),
-                "route_designation": departure.get('route', {}).get('designation', ''),
-                "platform_designation": departure.get('realtime_platform', {}).get('designation', ''),
-                "direction": departure.get('route', {}).get('direction', ''),
-            }
-            processed_data["departures"].append(departure_info)
-
-        filename = f"processed_departures_{datetime.now().strftime('%Y%m%d_%H%M')}.json"
-        try:
-            with open(filename, 'w', encoding='utf-8') as f:
-                json.dump(processed_data, f, ensure_ascii=False, indent=2)
-            logging.info(f"Processed data saved to {filename}")
-        except Exception as e:
-            logging.error(f"Error saving processed data: {str(e)}")
+            logging.error(f"Unexpected error: {e}")
+            raise
 
 def main():
-    """Main function to fetch bus times."""
     try:
         fetcher = BusTimesFetcher()
         fetcher.get_departures()
     except Exception as e:
-        logging.error(f"An unexpected error occurred: {str(e)}")
+        logging.error(f"Error in main: {e}")
+        raise
 
 if __name__ == "__main__":
     main() 

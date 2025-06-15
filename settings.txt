@@ -1,0 +1,2 @@
+# Trafiklab API Settings
+SITE_ID=740023156
