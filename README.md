@@ -16,6 +16,8 @@ A real-time bus departure display system using the Trafiklab API. This applicati
 ```
 TRAFIKLAB_API_KEY=your_api_key_here
 ```
+You get this by visiting the [Trafiklab's developer website](https://developer.trafiklab.se/)
+and signing up a developer account.
 
 2. Create a `settings.txt` file with your station ID:
 ```
@@ -24,9 +26,10 @@ SITE_ID=your_station_id_here
 ```
 
 You can find your station ID by:
-1. Going to [Trafiklab's API documentation](https://www.trafiklab.se/api)
-2. Looking up your station in their station list
-3. Using the station's ID in the settings file
+1. Going to [Trafiklab's API documentation](https://www.trafiklab.se/api/our-apis/trafiklab-realtime-apis/openapi-specification/#/Stop%20lookup/get_stops_name__searchValue_)
+2. Use their get stops lookup function.
+3. Enter your api-key and your station and it will search for it.
+4. Hopefully, you will have it by now.
 
 ## Installation
 
