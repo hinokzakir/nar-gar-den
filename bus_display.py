@@ -4,6 +4,8 @@ import json
 from datetime import datetime
 import time
 import threading
+import subprocess
+import os
 
 class BusDisplay:
     def __init__(self, root):
@@ -24,20 +26,53 @@ class BusDisplay:
                            font=('Courier', 20),
                            foreground='orange',
                            background='black')
+        self.style.configure('LastUpdate.TLabel',
+                           font=('Courier', 12),
+                           foreground='orange',
+                           background='black')
         
         # Create main container
         self.main_frame = ttk.Frame(root, style='Platform.TLabel')
         self.main_frame.pack(expand=True, fill='both', padx=20, pady=20)
         
+        # Create last update label
+        self.last_update_label = ttk.Label(root,
+                                         text="",
+                                         style='LastUpdate.TLabel')
+        self.last_update_label.pack(side='bottom', pady=5)
+        
         # Create platform frames
         self.platform_frames = {}
         
-        # Start update thread
-        self.update_thread = threading.Thread(target=self.update_loop, daemon=True)
-        self.update_thread.start()
+        # Start update threads
+        self.display_thread = threading.Thread(target=self.update_display_loop, daemon=True)
+        self.data_thread = threading.Thread(target=self.update_data_loop, daemon=True)
+        self.display_thread.start()
+        self.data_thread.start()
         
         # Bind escape key to exit
         self.root.bind('<Escape>', lambda e: self.root.quit())
+
+    def update_data(self):
+        """Fetch new data from the API and process it."""
+        try:
+            # Run bus_times.py
+            subprocess.run(['python3', 'bus_times.py'], check=True)
+            # Run process_departures.py
+            subprocess.run(['python3', 'process_departures.py'], check=True)
+            return True
+        except subprocess.CalledProcessError as e:
+            print(f"Error updating data: {e}")
+            return False
+
+    def update_data_loop(self):
+        """Update data every 10 minutes."""
+        while True:
+            if self.update_data():
+                self.last_update_label.config(
+                    text=f"Senast uppdaterad: {datetime.now().strftime('%H:%M:%S')}"
+                )
+            time.sleep(600)  # Wait 10 minutes
 
     def format_time_until(self, departure_time):
         now = datetime.now()
@@ -93,7 +128,8 @@ class BusDisplay:
         except Exception as e:
             print(f"Error updating display: {e}")
 
-    def update_loop(self):
+    def update_display_loop(self):
+        """Update the display every second."""
         while True:
             self.root.after(0, self.update_display)
             time.sleep(1)
