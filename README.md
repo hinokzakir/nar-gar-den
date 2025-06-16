@@ -12,6 +12,25 @@ As the swedish name might tell you this application only works in Sweden but the
 - Full-screen mode
 - Countdown timers for each departure
 
+## Remote Settings Management
+
+The application includes a web server that allows you to modify settings from any device on your local network:
+
+1. **Access the Web Interface**:
+   - Open a web browser on any device connected to the same network
+   - Navigate to `http://raspberry-pi-ip:5000`
+   - You'll see a simple form to modify settings
+
+2. **Available Settings**:
+   - `SITE_ID`: The bus stop ID 
+   - `DEPARTURES_TO_SHOW`: Number of departures to display per platform
+
+3. **How it Works**:
+   - The web server runs alongside the display application
+   - Changes are saved to `settings.txt`
+   - The display automatically detects changes and updates
+   - No need to restart the application when changing settings
+
 ## Setup
 
 1. Create a `.env` file in the project root with your Trafiklab API key:
@@ -24,8 +43,8 @@ and signing up a developer account.
 2. Create a `settings.txt` file with your station ID and how many departures you want displayed:
 ```
 # Trafiklab API Settings
-SITE_ID=your_station_id_here
-DEPARTURES_TO_SHOW=XX
+SITE_ID=740023156
+DEPARTURES_TO_SHOW=3
 ```
 
 You can find your station ID by:
