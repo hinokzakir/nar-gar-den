@@ -6,6 +6,17 @@ import time
 import threading
 import subprocess
 import os
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
+
+class FileWatcher(FileSystemEventHandler):
+    def __init__(self, callback):
+        self.callback = callback
+
+    def on_modified(self, event):
+        if not event.is_directory and event.src_path.endswith('settings.txt'):
+            print("settings.txt modified, triggering data update")
+            self.callback()
 
 class BusDisplay:
     def __init__(self, root):
@@ -41,6 +52,9 @@ class BusDisplay:
         self.display_thread.start()
         self.data_thread.start()
         
+        # Start file watcher for settings.txt
+        self.start_file_watcher()
+        
         # Bind escape key to exit
         self.root.bind('<Escape>', lambda e: self.root.quit())
 
@@ -66,7 +80,6 @@ class BusDisplay:
 
     def setup_fonts(self):
         """Setup fonts with Minecraft as primary choice."""
-        # Try to use Minecraft, fall back to Courier if not available
         try:
             # Check if Minecraft is available
             available_fonts = font.families()
@@ -103,6 +116,8 @@ class BusDisplay:
     def update_data(self):
         """Fetch new data from the API and process it."""
         try:
+            # Reload settings before fetching data
+            self.load_settings()
             # Run bus_times.py
             subprocess.run(['python3', 'bus_times.py'], check=True)
             # Run process_departures.py
@@ -120,6 +135,17 @@ class BusDisplay:
                     text=f"Senast uppdaterad: {datetime.now().strftime('%H:%M:%S')}"
                 )
             time.sleep(600)  # Wait 10 minutes
+
+    def start_file_watcher(self):
+        """Start watching settings.txt for changes."""
+        try:
+            self.observer = Observer()
+            self.event_handler = FileWatcher(self.update_data)
+            self.observer.schedule(self.event_handler, path='.', recursive=False)
+            self.observer.start()
+            print("Started file watcher for settings.txt")
+        except Exception as e:
+            print(f"Error starting file watcher: {e}")
 
     def format_time_until(self, departure_time):
         now = datetime.now()
@@ -184,7 +210,13 @@ class BusDisplay:
 def main():
     root = tk.Tk()
     app = BusDisplay(root)
-    root.mainloop()
+    try:
+        root.mainloop()
+    finally:
+        # Stop the observer when the application closes
+        if hasattr(app, 'observer'):
+            app.observer.stop()
+            app.observer.join()
 
 if __name__ == "__main__":
-    main() 
+    main()
